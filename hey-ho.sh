@@ -78,7 +78,8 @@ target () {
     ns=$(($RANDOM % namespaces))
     dep=$(($RANDOM % deployments))
   fi
-  export TARGET="http://hey-ho-${dep}.gallery${ns}:8080"
+  export TARGET="http://app-${dep}.gallery${ns}:8080"
+  #export TARGET="http://hey-ho-${dep}.gallery${ns}:8080"
 }
 
 export REPLICAS=${replicas}
@@ -139,7 +140,8 @@ do
     kubectl create namespace ${NAMESPACE}
   fi
   for (( d=0; d<$deployments; d++ )); do
-    export NAME="hey-ho-$d"
+    #export NAME="hey-ho-$d"
+    export NAME="app-$d"
     if [[ $fake -eq 1 ]]; then
       echo "DRY RUN - output:"
       echo ""
@@ -157,7 +159,8 @@ for (( n=0; n<$namespaces; n++ ))
 do
   NAMESPACE="gallery$n"
   for (( d=0; d<$deployments; d++ )); do
-    NAME="hey-ho-$d"
+    #NAME="hey-ho-$d"
+    NAME="app-$d"
     if [[ $fake -eq 1 ]]; then
       echo "  kubectl wait deployment ${NAME} -n ${NAMESPACE} --for condition=Available=True"
     else
@@ -172,7 +175,8 @@ for (( n=0; n<$namespaces; n++ ))
 do
   NAMESPACE="gallery$n"
   for (( d=0; d<$deployments; d++ )); do
-    NAME="hey-ho-$d"
+    #NAME="hey-ho-$d"
+    NAME="app-$d"
     # Set $TARGET
     target $n $d
     if [[ $fake -eq 1 ]]; then
