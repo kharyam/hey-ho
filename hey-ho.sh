@@ -26,7 +26,7 @@ show_help()
 delete_namespaces () {
   for (( n=0; n<$1; n++ ))
   do
-    kubectl delete namespace gallery$n
+    kubectl delete namespace project$n
   done
 }
 
@@ -78,8 +78,8 @@ target () {
     ns=$(($RANDOM % namespaces))
     dep=$(($RANDOM % deployments))
   fi
-  export TARGET="http://app-${dep}.gallery${ns}:8080"
-  #export TARGET="http://hey-ho-${dep}.gallery${ns}:8080"
+  export TARGET="http://app-${dep}.project${ns}:8080"
+  #export TARGET="http://hey-ho-${dep}.project${ns}:8080"
 }
 
 export REPLICAS=${replicas}
@@ -135,7 +135,7 @@ echo ""
 echo "Deploying pods"
 for (( n=0; n<$namespaces; n++ ))
 do
-  export NAMESPACE="gallery$n"
+  export NAMESPACE="project$n"
   if [[ $fake -ne 1 ]]; then
     kubectl create namespace ${NAMESPACE}
   fi
@@ -157,7 +157,7 @@ done
 echo "Waiting pods availability..."
 for (( n=0; n<$namespaces; n++ ))
 do
-  NAMESPACE="gallery$n"
+  NAMESPACE="project$n"
   for (( d=0; d<$deployments; d++ )); do
     #NAME="hey-ho-$d"
     NAME="app-$d"
@@ -173,7 +173,7 @@ done
 echo "Start sending load"
 for (( n=0; n<$namespaces; n++ ))
 do
-  NAMESPACE="gallery$n"
+  NAMESPACE="project$n"
   for (( d=0; d<$deployments; d++ )); do
     #NAME="hey-ho-$d"
     NAME="app-$d"
