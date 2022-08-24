@@ -18,6 +18,7 @@ show_help()
    echo "-q qps     Rate limit, in query per seconds. 0 means no limit. Default: 200"
    echo "-p         Predictable mode (no random target assignment). Default: disabled"
    echo "-y         Non-interactive mode, reply 'yes' to prompt. Default: disabled"
+   echo "-s         Skip creation of namespaces/pods/services"
    echo "-f         Fake / dry run. Default: disabled"
    echo "-h         Print this help."
    echo
@@ -37,7 +38,7 @@ workers=50
 duration=30s
 qps=200
 
-while getopts "h?cn:d:r:w:z:q:pyf" opt; do
+while getopts "h?cn:d:r:w:z:q:pyfs" opt; do
   case $opt in
     h|\?)
       show_help
@@ -53,6 +54,7 @@ while getopts "h?cn:d:r:w:z:q:pyf" opt; do
     p) predictable=1 ;;
     y) yes=1 ;;
     f) fake=1 ;;
+    s) skip=1 ;;
     *) echo 'error' >&2
        exit 1
   esac
@@ -132,29 +134,31 @@ echo ""
 
 
 # generate deployments
-echo "Deploying pods"
-for (( n=0; n<$namespaces; n++ ))
-do
-  export NAMESPACE="project$n"
-  if [[ $fake -ne 1 ]]; then
-    kubectl create namespace ${NAMESPACE}
-  fi
-  for (( d=0; d<$deployments; d++ )); do
-    #export NAME="hey-ho-$d"
-    export NAME="app-$d"
-    if [[ $fake -eq 1 ]]; then
-      echo "DRY RUN - output:"
-      echo ""
-      envsubst < ./hey-ho-tpl.yaml
-      echo "---"
-    else
-      envsubst < ./hey-ho-tpl.yaml | kubectl apply -n ${NAMESPACE} -f -
+if [[ $skip -ne 1 ]]; then
+  echo "Deploying pods"
+  for (( n=0; n<$namespaces; n++ ))
+  do
+    export NAMESPACE="project$n"
+    if [[ $fake -ne 1 ]]; then
+      kubectl create namespace ${NAMESPACE}
     fi
+    for (( d=0; d<$deployments; d++ )); do
+      #export NAME="hey-ho-$d"
+      export NAME="app-$d"
+      if [[ $fake -eq 1 ]]; then
+        echo "DRY RUN - output:"
+        echo ""
+        envsubst < ./hey-ho-tpl.yaml
+        echo "---"
+      else
+        envsubst < ./hey-ho-tpl.yaml | kubectl apply -n ${NAMESPACE} -f -
+      fi
+    done
   done
-done
+fi
 
 # wait until they're all ready
-echo "Waiting pods availability..."
+cho "Waiting pods availability..."
 for (( n=0; n<$namespaces; n++ ))
 do
   NAMESPACE="project$n"
