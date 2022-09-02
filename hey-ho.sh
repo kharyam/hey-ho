@@ -158,7 +158,7 @@ if [[ $skip -ne 1 ]]; then
 fi
 
 # wait until they're all ready
-cho "Waiting pods availability..."
+echo "Waiting pods availability..."
 for (( n=0; n<$namespaces; n++ ))
 do
   NAMESPACE="project$n"
